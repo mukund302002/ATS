@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import './PromptInput.css';
 
 const PromptInput = () => {
-  const [jobDescription, setJobDescription] = useState('');
+  const [category, setcategory] = useState('');
   const [prompt, setPrompt] = useState('');
   const [numCandidates, setNumCandidates] = useState('');
   const [output, setOutput] = useState({});
@@ -15,7 +15,7 @@ const PromptInput = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ jobDescription, prompt, numCandidates }),
+      body: JSON.stringify({ category, prompt, numCandidates }),
     });
     const data = await response.json();
     setOutput(data);
@@ -28,8 +28,8 @@ const PromptInput = () => {
           <input
             className="desc"
             type="text"
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
+            value={category}
+            onChange={(e) => setcategory(e.target.value)}
             placeholder="Enter the Job Description"
           />
           <input
@@ -56,11 +56,11 @@ const PromptInput = () => {
         </form>
       </div>
 
-      {output.jobDescription && (
+      {output.category && (
         <div className="container output">
           <div>
             <h2>Job Description:</h2>
-            <p>{output.jobDescription}</p>
+            <p>{output.category}</p>
           </div>
           <div>
             <h2>Prompt:</h2>
