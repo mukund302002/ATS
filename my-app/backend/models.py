@@ -7,6 +7,11 @@ import os
 import httpx
 import logging
 import fitz
+import requests
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from io import BytesIO
+
 load_dotenv()
 
 logging.basicConfig(level=logging.DEBUG)
@@ -19,10 +24,45 @@ SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 print(SUPABASE_KEY)
 supabase_client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-def scoring(job_description,content,id):
-    return
 
 
+def fetch_urls(category):
+    response = supabase_client.table(category).select('id, url').execute()
+    return response.data
+
+def extract_text_from_pdf(url):
+    response = requests.get(url)
+    response.raise_for_status()  # Ensure the request was successful
+    pdf_data = BytesIO(response.content)
+    
+    document = fitz.open(stream=pdf_data, filetype="pdf")
+    text = ""
+    for page in document:
+        text += page.get_text()
+    
+    logging.debug(f"Text extracted successfully: {text[:20000]}")  # Log the first 1000 characters for brevity
+    return text
+
+
+def compute_similarity(text, job_description):
+        documents = [text, job_description]
+        tfidf = TfidfVectorizer().fit_transform(documents)
+        similarity_matrix = cosine_similarity(tfidf[0:1], tfidf)
+        logging.debug(f"similarity computed success{similarity_matrix[0][1]}")
+        return similarity_matrix[0][1]
+
+
+
+def process_pdfs(job_description,category):
+        logging.debug(f"process pdfs started")
+        urls = fetch_urls(category)
+        logging.debug(f"urls fetched successfully{urls}")
+        for entry in urls:
+            pdf_text = extract_text_from_pdf(entry['url'])
+            score = compute_similarity(pdf_text, job_description)
+            # Update the database with the similarity score
+            supabase_client.table(category).update({'score': score}).eq('id', entry['id']).execute()
+            logging.debug(f"updated score to database successfully")
 # def row_count(name):
 #     table_name = name
 #     logging.debug(f"table name is {table_name}")
