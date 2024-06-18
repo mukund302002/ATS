@@ -27,8 +27,18 @@ supabase_client: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 def fetch_urls(category):
-    response = supabase_client.table(category).select('id, url').execute()
-    return response.data
+    # Fetch all rows from the specified category table
+    response = supabase_client.table(category).select('url').execute()
+    
+    # Check for errors
+    # if response.error:
+    #     print(f"Error: {response.error.message}")
+    #     return []
+    
+    # Extract URLs from each row and collect them into a list
+    urls = [row['url'] for row in response.data]
+    
+    return urls
 
 def extract_text_from_pdf(url):
     response = requests.get(url)
@@ -43,13 +53,25 @@ def extract_text_from_pdf(url):
     logging.debug(f"Text extracted successfully: {text[:20000]}")  # Log the first 1000 characters for brevity
     return text
 
+from sentence_transformers import SentenceTransformer, util
+model = SentenceTransformer('all-MiniLM-L6-v2')
+def compute_similarity(text, job_description, model, util):
+    # Compute embeddings for the text and job description
+    jd_embedding = model.encode(job_description, convert_to_tensor=True)
+    content_embedding = model.encode(text, convert_to_tensor=True)
+    
+    # Compute cosine similarity between the embeddings
+    score = util.cos_sim(jd_embedding, content_embedding)
+    
+    # Extract the float value from the tensor
+    similarity_score = score.item()
+    
+    return similarity_score
 
-def compute_similarity(text, job_description):
-        documents = [text, job_description]
-        tfidf = TfidfVectorizer().fit_transform(documents)
-        similarity_matrix = cosine_similarity(tfidf[0:1], tfidf)
-        logging.debug(f"similarity computed success{similarity_matrix[0][1]}")
-        return similarity_matrix[0][1]
+
+def get_embeddings(text):
+    embeddings = model.encode(text, convert_to_tensor=True)
+    return embeddings.cpu().tolist()  # Convert tensor to list
 
 
 
