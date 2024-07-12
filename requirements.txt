@@ -6,5 +6,6 @@ PyPDF2
 supabase
 sqlalchemy
 httpx
+google.generativeai
 tenacity
 streamlit==1.36.0
