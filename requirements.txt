@@ -48,7 +48,7 @@ pillow==10.4.0
 postgrest==0.16.8
 proto-plus==1.24.0
 protobuf==4.25.3
-psycopg2==2.9.9
+psycopg2-binary
 pyarrow==16.1.0
 pyasn1==0.6.0
 pyasn1_modules==0.4.0
