@@ -92,7 +92,6 @@ google-auth-oauthlib==1.2.0
 google-generativeai==0.4.1
 googleapis-common-protos==1.62.0
 gotrue==2.5.4
-gradio==4.21.0
 gradio_client==0.12.0
 greenlet==3.0.1
 grpcio==1.60.1
