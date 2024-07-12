@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 import logging, requests
 from sentence_transformers import util
 import google.generativeai as genai
@@ -13,10 +13,11 @@ from supabase import create_client, Client
 from sqlalchemy import create_engine
 
 # Load environment variables
-DATABASE_URL = st.secrets["DATABASE_URL"]
-SUPABASE_URL = st.secrets["SUPABASE_URL"]
-SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
-API_KEY_GEMINI = st.secrets["API_TOKEN_GEMINI"]
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+API_KEY_GEMINI = os.getenv("API_TOKEN_GEMINI")
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
